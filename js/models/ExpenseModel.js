@@ -3,6 +3,7 @@
 // libs
 import uuid from 'uuid';
 import {Record} from 'immutable';
+import moment from 'moment';
 
 import {toNearestCent} from '../helpers/math';
 
@@ -26,7 +27,7 @@ export default class Expense extends ExpenseRecord {
   constructor(expense: object) {
     super({
       id: uuid.v4(),
-      date: expense.date,
+      date: +moment(expense.date),
       vendor: expense.vendor,
       amount: toNearestCent(expense.amount),
       categoryID: expense.categoryID,

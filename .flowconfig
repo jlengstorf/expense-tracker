@@ -1,0 +1,10 @@
+[ignore]
+.*/node_modules/react/.*
+.*/node_modules/flux/flow/.*
+.*/node_modules/flux/node_modules/.*
+
+[include]
+
+[libs]
+
+[options]

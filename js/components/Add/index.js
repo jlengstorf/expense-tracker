@@ -7,7 +7,8 @@ import moment from 'moment';
 import debug from 'debug';
 
 // components
-// import Expense from './Expense';
+import Input from '../Form/Input';
+import Select from '../Form/Select';
 
 // dispatcher
 import {dispatch} from '../../dispatcher';
@@ -24,8 +25,8 @@ type State = {
   date: string,
   amount: number,
   vendor: number,
-  categoryID: number,
-  personID: number,
+  categoryID: ?string,
+  personID: ?string,
 };
 
 export default class Add extends Component<{}, Props, State> {
@@ -33,7 +34,6 @@ export default class Add extends Component<{}, Props, State> {
   constructor(props) {
     super(props);
 
-    log('TODO Set the personID to match the logged in user');
     this.state = {
       data: Map({
         date: moment().format('YYYY-MM-DD'),
@@ -45,6 +45,28 @@ export default class Add extends Component<{}, Props, State> {
     };
   }
 
+  componentWillReceiveProps(nextProps: Props): void {
+
+    // Starts by checking that the categoryID is valid
+    if (!this.state.data.categoryID && nextProps.categories.size > 0) {
+      log('categoryID is false; setting manually.');
+      this.setState(({data}) => ({
+        data: data.set('categoryID', nextProps.categories.first().id),
+      }));
+      log(`categoryID: ${nextProps.categories.first().id}`);
+    }
+
+    // Checks that the personID is valid
+    if (!this.state.data.personID && nextProps.people.size > 0) {
+      log('personID is false; setting manually.');
+      log('TODO Set the personID to match the logged in user');
+      this.setState(({data}) => ({
+        data: data.set('personID', nextProps.people.first().id),
+      }));
+      log(`personID: ${nextProps.people.first().id}`);
+    }
+  }
+
   render(): ?ReactElement {
     const {
       categories,
@@ -54,74 +76,41 @@ export default class Add extends Component<{}, Props, State> {
     return (
       <form onSubmit={this._onSubmit.bind(this)}>
         <h2>Add an Expense</h2>
-        <div>
-          <label htmlFor="date">Date</label>
-          <input
-            id="date"
-            name="date"
-            type="text"
-            pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))"
-            placeholder="YYYY-MM-DD"
-            value={this.state.data.get('date')}
-            onChange={this._onChange.bind(this)}
-          />
-        </div>
-        <div>
-          <label htmlFor="amount">Amount</label>
-          <input
-            id="amount"
-            name="amount"
-            type="number"
-            placeholder="0.00"
-            value={this.state.data.get('amount')}
-            onChange={this._onChange.bind(this)}
-          />
-        </div>
-        <div>
-          <label htmlFor="vendor">Vendor</label>
-          <input
-            id="vendor"
-            name="vendor"
-            type="text"
-            placeholder="e.g. Acme Corp"
-            value={this.state.data.get('vendor')}
-            onChange={this._onChange.bind(this)}
-          />
-        </div>
-        <div>
-          <label htmlFor="categoryID">Category</label>
-          <select
-            id="categoryID"
-            name="categoryID"
-            onChange={this._onChange.bind(this)}
-            value={this.state.data.get('categoryID')}
-          >
-            {categories.valueSeq().map(category => {
-              return (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="personID">Paid By</label>
-          <select
-            id="personID"
-            name="personID"
-            onChange={this._onChange.bind(this)}
-            value={this.state.data.get('personID')}
-          >
-            {people.valueSeq().map(person => {
-              return (
-                <option key={person.id} value={person.id}>
-                  {person.fname}
-                </option>
-              );
-            })}
-          </select>
-        </div>
+        <Input
+          label="Date"
+          name="date"
+          pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))"
+          value={moment(this.state.data.date).format('YYYY-MM-DD')}
+          changeHandler={this._onChange.bind(this)}
+        />
+        <Input
+          label="Amount"
+          name="amount"
+          type="number"
+          value={this.state.data.amount}
+          changeHandler={this._onChange.bind(this)}
+        />
+        <Input
+          label="Vendor"
+          name="vendor"
+          placeholder="e.g. Acme Corp"
+          value={this.state.data.vendor}
+          changeHandler={this._onChange.bind(this)}
+        />
+        <Select
+          label="Category"
+          name="categoryID"
+          value={this.state.data.categoryID}
+          options={categories}
+          changeHandler={this._onChange.bind(this)}
+        />
+        <Select
+          label="Paid By"
+          name="personID"
+          value={this.state.data.personID}
+          options={people}
+          changeHandler={this._onChange.bind(this)}
+        />
         <div>
           <button>Add Expense</button>
         </div>

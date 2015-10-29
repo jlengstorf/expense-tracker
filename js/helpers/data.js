@@ -17,4 +17,10 @@ export default {
 
     return dataArrays.pop();
   },
+
+  /**
+   * Some stores need to be rebuilt on every change, so this resets them
+   * @return {State} An empty immutable map to replace the current state
+   */
+  reset: () => Map(),
 };

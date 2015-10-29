@@ -20,9 +20,9 @@ export default function Expenses(props) {
   expenses.valueSeq().forEach(log);
 
   return (
-    <div>
-      <h2>List of Expenses</h2>
-      <ul>
+    <div className="expenses">
+      <h2 className="expenses__heading">List of Expenses</h2>
+      <ul className="expenses__list">
         {expenses.valueSeq().map(expense => {
           return (
             <Expense

@@ -9,7 +9,6 @@ import {formatMoney} from 'accounting';
 import debug from 'debug';
 
 // components
-import ExpenseData from './ExpenseData';
 import Input from '../Form/Input';
 import Select from '../Form/Select';
 

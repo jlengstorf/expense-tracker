@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 
 // // libs
@@ -28,8 +29,13 @@ import {dispatch} from '../dispatcher';
 // debugger
 const log = debug('components/ExpenseTracker');
 
+// types
 type State = {
-  expenses: Immutable.Map,
+  expenses: Immutable.Map<string, Expense>,
+  categories: Immutable.Map<string, Category>,
+  people: Immutable.Map<string, Person>,
+  spending: Immutable.Map<string, Spending>,
+  debts: Immutable.Map<string, Debt>,
 };
 
 class ExpenseTracker extends Component<{}, {}, State> {
@@ -44,7 +50,7 @@ class ExpenseTracker extends Component<{}, {}, State> {
     ];
   }
 
-  static calculateState(prevState: ?State): State {
+  static calculateState(prevState: ?State): Object {
     return {
       expenses: ExpenseStore.getState(),
       categories: CategoryStore.getState(),
@@ -54,7 +60,7 @@ class ExpenseTracker extends Component<{}, {}, State> {
     };
   }
 
-  render(): ?ReactElement {
+  render(): ReactElement {
     let categories = [];
     this.state.spending.valueSeq().map(category => {
       let splits = [];
@@ -67,7 +73,6 @@ class ExpenseTracker extends Component<{}, {}, State> {
         );
       });
 
-      log(splits);
       categories[category.id] = (
         <p key={category.id}>
           Category: {category.name} ({splits.join(', ')})
@@ -76,8 +81,7 @@ class ExpenseTracker extends Component<{}, {}, State> {
     });
 
     return (
-      <div>
-        <h1>Expense Tracking App</h1>
+      <div className="expense-tracker">
         <Add
           categories={this.state.categories}
           people={this.state.people}

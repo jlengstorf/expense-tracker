@@ -1,0 +1,57 @@
+.expense {
+
+  &__list {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+  }
+
+  &__item {
+    flex: 1;
+    margin-top: 0;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  &__data-display {
+    display: inline-block;
+  }
+
+  &__input {
+    display: none;
+  }
+
+  &__category-icon {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    padding: 0;
+    background: $color-darkest;
+    border-radius: 50%;
+    color: $color-lightest;
+    font-size: 14px;
+    line-height: 24px;
+    text-align: center;
+  }
+
+  &__edit-control {
+    display: inline-block;
+    width: 15px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 24px;
+    text-align: center;
+  }
+
+  /* show controls/hide spans only when editing */
+  &--editing {
+    .expense__data-display {
+      display: none;
+    }
+
+    .expense__input {
+      display: block;
+    }
+  }
+}

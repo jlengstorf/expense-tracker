@@ -1,0 +1,15 @@
+/* variables */
+
+/* styles */
+.expenses {
+  &__list {
+    list-style: none;
+    padding: 0;
+  }
+
+  &__item {
+    margin: 0;
+    padding: 5px;
+    border: 1px solid #eee;
+  }
+}

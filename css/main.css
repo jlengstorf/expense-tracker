@@ -1,0 +1,60 @@
+/*
+ * # main.css
+ * Master stylesheet for the app, which loads in all other styles.
+ */
+
+/*
+ * ## Basic Reset
+ * Not a full CSS reset; just setting some sane defaults.
+ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+/*
+ * Using the lobotomized owl selector (via @heydonworks)
+ * @see http://alistapart.com/article/axiomatic-css-and-lobotomized-owls
+ */
+*+* {
+  margin-top: 10px;
+}
+
+header,main,footer {
+  display: block;
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+/*
+ * ## Variables
+ * Keeps site-wide settings concentrated in one place.
+ */
+$color-lightest: #FFF;
+$color-darkest: #000;
+
+
+/*
+ * ## Components
+ * Loads the required components for the app.
+ */
+
+@import './components/ExpenseTracker.css';
+@import './components/Expenses.css';
+@import './components/Expense.css';

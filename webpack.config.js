@@ -33,6 +33,22 @@ var publicPath = '/dist/';
 
 
 /*
+ * ---------
+ *  PostCSS
+ * ---------
+ */
+
+var PostCssImport = require('postcss-import')({ glob: true });
+var PostCssNested = require('postcss-nested');
+var PostCssSimpleVars = require('postcss-simple-vars');
+var CssNext = require('cssnext')();
+var CssNano = require('cssnano')();
+
+// CSS should be extracted to a separate file
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
+
+
+/*
  * -------
  *  SETUP
  * -------
@@ -61,11 +77,24 @@ module.exports = {
     ],
 
     loaders: [
-      { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
+      { test: /\.js$/, exclude: /node_modules/, loader: 'babel?sourceMap' },
+      { test: /\.css$/, loader: 'style!css!postcss-loader?sourceMap' },
+      { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
+      { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" },
     ]
   },
 
+  postcss: function () {
+    return [
+      PostCssImport,
+      PostCssNested,
+      PostCssSimpleVars,
+      CssNext,
+      CssNano
+    ];
+  },
+
   plugins: [
-    replaceConfig
+    replaceConfig,
   ]
 };

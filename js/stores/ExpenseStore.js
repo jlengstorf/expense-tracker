@@ -3,6 +3,7 @@
 // libs
 import {Map} from 'immutable';
 import {ReduceStore} from 'flux/utils';
+import moment from 'moment';
 import debug from 'debug';
 
 // flux infrastructure
@@ -16,14 +17,14 @@ import {bootstrap} from '../helpers/data';
 import Expense from '../models/ExpenseModel';
 
 // types
-type State = Immutable.Map<string, Expense>;
+type State = Map;
 
 // debugger
 const log = debug('store/ExpenseStore');
 
 class ExpenseStore extends ReduceStore<string, Expense> {
 
-  getInitialState(): State {
+  getInitialState(): Map {
     return Map();
   }
 
@@ -42,8 +43,11 @@ class ExpenseStore extends ReduceStore<string, Expense> {
         break;
 
       case 'expense/update':
-        const {name, value} = action.fieldToUpdate;
-        state = state.setIn([action.id, name], value);
+        state = state.set(action.id, action.expense);
+        break;
+
+      case 'expense/delete':
+        state = state.delete(action.id);
         break;
 
       default:
@@ -59,28 +63,28 @@ class ExpenseStore extends ReduceStore<string, Expense> {
 log('TODO: Move expense data to a database/localStorage');
 const tempExpenses = [
   {
-    date: Date.UTC(2015, 10, 25),
+    date: +moment('2015-10-25'),
     vendor: 'Delta Airlines',
     amount: 800.00,
     categoryID: '95c1b56d-c585-4f24-ad4c-f3310a3eca2a',
     personID: '6db0719a-603d-4986-8366-5bb6824ef9c2',
   },
   {
-    date: Date.UTC(2015, 10, 24),
+    date: +moment('2015-10-24'),
     vendor: 'McDonald\'s',
     amount: 8.00,
     categoryID: '5601dfda-610a-4762-85de-e51e1b9d5a10',
     personID: '0ba081f6-9261-4c16-8476-9049165a7f04',
   },
   {
-    date: Date.UTC(2015, 10, 23),
+    date: +moment('2015-10-23'),
     vendor: 'Coconut Beach',
     amount: 700.00,
     categoryID: '782eade6-0386-42ba-b910-de4bd209ed90',
     personID: '0ba081f6-9261-4c16-8476-9049165a7f04',
   },
   {
-    date: Date.UTC(2015, 10, 22),
+    date: +moment('2015-10-22'),
     vendor: 'Buri Resort',
     amount: 400.00,
     categoryID: '782eade6-0386-42ba-b910-de4bd209ed90',

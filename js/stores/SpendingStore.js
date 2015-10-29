@@ -1,13 +1,16 @@
 'use strict';
 
 // libs
-import {Map, List} from 'immutable';
+import {Map} from 'immutable';
 import {ReduceStore} from 'flux/utils';
 import debug from 'debug';
 
 // flux infrastructure
 import type Action from '../actions';
 import Dispatcher from '../dispatcher';
+
+// helpers
+import {reset} from '../helpers/data';
 
 // models
 import Spending from '../models/SpendingModel';
@@ -18,14 +21,14 @@ import CategoryStore from './CategoryStore';
 import PersonStore from './PersonStore';
 
 // types
-type State = Immutable.Map<string, Spending>;
+type State = Map<string, Spending>;
 
 // debugger
 const log = debug('store/SpendingStore');
 
 class SpendingStore extends ReduceStore<string, Spending> {
 
-  getInitialState(): State {
+  getInitialState(): Map {
     return Map();
   }
 
@@ -33,12 +36,15 @@ class SpendingStore extends ReduceStore<string, Spending> {
     switch (action.type) {
       case 'app/initialize':
       case 'expense/create':
+      case 'expense/update':
+      case 'expense/delete':
         this.getDispatcher().waitFor([
           ExpenseStore.getDispatchToken(),
           CategoryStore.getDispatchToken(),
           PersonStore.getDispatchToken(),
         ]);
 
+        state = reset();
         state = getSpending(state);
         break;
 
@@ -68,6 +74,8 @@ function getSpending(state) {
       actual: getActualSpending(data),
     });
 
+    log(`getSpending() => ${person.fname} — expected: ${spending.expected} | actual: ${spending.actual}`);
+
     state = state.set(spending.id, spending);
   });
 
@@ -88,14 +96,10 @@ function getActualSpending(data) {
     }
   });
 
-  log(`getActualSpending() for person ID ${personID} => ${actual}`);
-
   return actual;
 }
 
 function getExpectedSpending(data) {
-  log('getExpectedSpending()');
-
   const {
     personID,
     expenses,
@@ -108,14 +112,11 @@ function getExpectedSpending(data) {
 
     // Grabs the split data and multiplies the amount accordingly
     category.get('split').forEach(split => {
-      log(split);
       if (split.personID === personID) {
-        expected += expense.amount * split.percent / 100;
+        expected += expense.amount * split.percent;
       }
     });
   });
-
-  log(`returns for personID ${personID} => ${expected}`);
 
   return expected;
 }

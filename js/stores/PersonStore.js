@@ -5,6 +5,8 @@ import {Map, List} from 'immutable';
 import {ReduceStore} from 'flux/utils';
 import debug from 'debug';
 
+import type Immutable from 'immutable';
+
 // flux infrastructure
 import type Action from '../actions';
 import Dispatcher from '../dispatcher';
@@ -26,7 +28,7 @@ const log = debug('store/PersonStore');
 
 class PersonStore extends ReduceStore<string, Person> {
 
-  getInitialState(): State {
+  getInitialState(): Map {
     return Map();
   }
 

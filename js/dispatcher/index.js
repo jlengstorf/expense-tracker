@@ -13,6 +13,7 @@ export default instance;
 // So we can conveniently do, `import {dispatch} from './TodoDispatcher';`
 function dispatchWrapper(action) {
   log(`action: ${action.type}`);
+  log(action);
 
   this.dispatch(action);
 }

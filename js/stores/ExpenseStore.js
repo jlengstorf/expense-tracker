@@ -55,7 +55,9 @@ class ExpenseStore extends ReduceStore<string, Expense> {
 
     }
 
-    return state;
+    // Sorts to keep expenses in reverse chronological order for now
+    // TODO add different sorting options
+    return state.sortBy(expense => expense.date, (a, b) => a < b);
   }
 
 }
@@ -63,28 +65,28 @@ class ExpenseStore extends ReduceStore<string, Expense> {
 log('TODO: Move expense data to a database/localStorage');
 const tempExpenses = [
   {
-    date: +moment('2015-10-25'),
+    date: +moment('2015-10-25T11:10:31+07:00'),
     vendor: 'Delta Airlines',
     amount: 800.00,
     categoryID: '95c1b56d-c585-4f24-ad4c-f3310a3eca2a',
     personID: '6db0719a-603d-4986-8366-5bb6824ef9c2',
   },
   {
-    date: +moment('2015-10-24'),
-    vendor: 'McDonald\'s',
+    date: +moment('2015-10-25T08:02:17+07:00'),
+    vendor: 'Bondi Cafe',
     amount: 8.00,
     categoryID: '5601dfda-610a-4762-85de-e51e1b9d5a10',
     personID: '0ba081f6-9261-4c16-8476-9049165a7f04',
   },
   {
-    date: +moment('2015-10-23'),
+    date: +moment('2015-10-25T07:57:59+07:00'),
     vendor: 'Coconut Beach',
     amount: 700.00,
     categoryID: '782eade6-0386-42ba-b910-de4bd209ed90',
     personID: '0ba081f6-9261-4c16-8476-9049165a7f04',
   },
   {
-    date: +moment('2015-10-22'),
+    date: +moment('2015-10-24T21:42:13+07:00'),
     vendor: 'Buri Resort',
     amount: 400.00,
     categoryID: '782eade6-0386-42ba-b910-de4bd209ed90',

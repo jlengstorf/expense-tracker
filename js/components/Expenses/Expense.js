@@ -9,6 +9,7 @@ import {formatMoney} from 'accounting';
 import debug from 'debug';
 
 // components
+import Add from '../Add';
 import Input from '../Form/Input';
 import Select from '../Form/Select';
 
@@ -19,12 +20,11 @@ import {dispatch} from '../../dispatcher';
 const log = debug('components/Expense');
 
 // helper function
-function _delete(event) {
-  log(event);
+function _delete(id, event) {
   event.preventDefault();
   dispatch({
     type: 'expense/delete',
-    id: event.target.getAttribute('data-id'),
+    id: id,
   });
 }
 
@@ -54,7 +54,7 @@ export default class Expense extends Component<{}, Props, State> {
     };
   }
 
-  render() {
+  render(): ReactElement {
     const {
       categories,
       people,
@@ -74,95 +74,60 @@ export default class Expense extends Component<{}, Props, State> {
 
     return (
       <li className={classes} onDoubleClick={this._onDoubleClick.bind(this)}>
-        <ul className="expense__list">
-          <li className="expense__item">
-            <span className="expense__data-display">
-              {moment(this.state.expense.date).format('MMM D')}
+        <div
+          className="expense__display"
+          data-category={category.name}
+        >
+          <span className="expense__paidby">
+            {person.fname}
+          </span>
+          <span className="expense__amount">
+            {formatMoney(this.state.expense.amount)}
+          </span>
+          <span className="expense__vendor">
+            {this.state.expense.vendor}
+          </span>
+          <span className="expense__category">
+            {category.name}
+          </span>
+        </div>
+        <div className="expense__controls">
+          <button
+            className="expense__control expense__control--edit"
+            onClick={this._toggleEditing.bind(this)}
+          >
+            <span className="sr-only">
+              {(this.state.isEditing) ? 'save' : 'edit'}
             </span>
-            <Input
-              name="date"
-              inputClass="expense__input"
-              value={moment(this.state.expense.date).format('YYYY-MM-DD')}
-              changeHandler={this._onChange.bind(this)}
-              keyDownHandler={this._onKeyDown.bind(this)}
+            <i
+              className={`fa fa-${!this.state.isEditing ? 'pencil' : 'check'}`}
             />
-          </li>
-          <li className="expense__item">
-            <span className="expense__data-display">
-              {formatMoney(this.state.expense.amount)}
-            </span>
-            <Input
-              name="amount"
-              inputClass="expense__input"
-              type="number"
-              value={this.state.expense.amount}
-              changeHandler={this._onChange.bind(this)}
-              keyDownHandler={this._onKeyDown.bind(this)}
-            />
-          </li>
-          <li className="expense__item">
-            <span className="expense__data-display">
-              {this.state.expense.vendor}
-            </span>
-            <Input
-              name="vendor"
-              inputClass="expense__input"
-              value={this.state.expense.vendor}
-              changeHandler={this._onChange.bind(this)}
-              keyDownHandler={this._onKeyDown.bind(this)}
-            />
-          </li>
-          <li className="expense__item">
-            <span className="expense__data-display">
-              <span className="sr-only">{category.name}</span>
-              <i className={`fa fa-${category.icon} expense__category-icon`}></i>
-            </span>
-            <Select
-              name="categoryID"
-              inputClass="expense__input"
-              value={category.id}
-              options={categories}
-              changeHandler={this._onChange.bind(this)}
-            />
-          </li>
-          <li className="expense__item">
-            <span className="expense__data-display">
-              {person.fname}
-            </span>
-            <Select
-              name="personID"
-              inputClass="expense__input"
-              value={person.id}
-              options={people}
-              changeHandler={this._onChange.bind(this)}
-            />
-          </li>
-          <li className="expense__item">
-            <a
-              href="#"
-              className="expense__edit-control"
-              onClick={this._toggleEditing.bind(this)}
-            >
-              <span className="sr-only">{(this.state.isEditing) ? 'save' : 'edit'}</span>
-              <i className={`fa fa-${!this.state.isEditing ? 'pencil' : 'check'}`} />
-            </a>
-            <a
-              href="#"
-              className="expense__edit-control"
-              data-id={this.state.expense.id}
-              onClick={_delete}
-            >
-              <span className="sr-only">delete</span>
-              <i className="fa fa-times-circle-o" />
-            </a>
-          </li>
-        </ul>
+          </button>
+          <button
+            className="expense__control expense__control--delete"
+            onClick={_delete.bind(null, this.state.expense.id)}
+          >
+            <span className="sr-only">delete</span>
+            <i className="fa fa-times-circle-o" />
+          </button>
+        </div>
+        <div className="expense__update-form">
+          <Add
+            expense={this.state.expense}
+            categories={categories}
+            people={people}
+            changeHandler={this._onChange.bind(this)}
+            submitHandler={this._onSubmit.bind(this)}
+          />
+        </div>
       </li>
     );
   }
 
   _onChange(event: SyntheticEvent): void {
     let {name, value} = event.target;
+
+    log('_onChange()');
 
     // Parses the date into a UTC timestamp
     if (name === 'date') {
@@ -197,10 +162,9 @@ export default class Expense extends Component<{}, Props, State> {
     this.setState({isEditing: false});
   }
 
-  _onKeyDown(event): void {
-    if (event.keyCode === ENTER_KEY_CODE) {
-      this._toggleEditing();
-    }
+  _onSubmit(event): void {
+    event.preventDefault();
+    this._toggleEditing();
   }
 
   _onDoubleClick(): void {

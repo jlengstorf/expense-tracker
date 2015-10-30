@@ -1,44 +1,43 @@
 .expense {
+  position: relative;
+  overflow: hidden;
 
-  &__list {
-    list-style: none;
-    display: flex;
-    justify-content: space-between;
-    margin: 0;
-  }
-
-  &__item {
-    flex: 1;
-    margin-top: 0;
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  &__data-display {
-    display: inline-block;
-  }
-
-  &__input {
+  /* editing form */
+  &__update-form {
+    position: absolute;
+    left: 50%;
+    bottom: 120vh;
+    opacity: 0;
+    transform: translate3d(-50%, 0, 0);
+    transition: 0.5s 2.5s all ease-in-out;
     display: none;
+    width: 94vw;
+    height: 94vh;
+    padding: 4vw;
+    background: $color-lightest;
+    border: 2px solid color( $color-lightest blackness(+ 10%) );
+    border-radius: 10px;
+    box-shadow: 0 0 5px color($color-darkest alpha(10%) );
+    pointer-events: none;
+    z-index: 10;
   }
 
-  &__category-icon {
-    width: 24px;
-    height: 24px;
+  /* editing controls */
+  &__controls {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
     margin: 0;
-    padding: 0;
-    background: $color-darkest;
-    border-radius: 50%;
-    color: $color-lightest;
-    font-size: 14px;
-    line-height: 24px;
-    text-align: center;
   }
 
-  &__edit-control {
+  &__control {
     display: inline-block;
     width: 15px;
-    margin: 0;
+    margin: 0 5px 0 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
     font-size: 12px;
     line-height: 24px;
     text-align: center;
@@ -46,12 +45,37 @@
 
   /* show controls/hide spans only when editing */
   &--editing {
-    .expense__data-display {
+    overflow: visible;
+
+    .expense__display {
       display: none;
     }
 
-    .expense__input {
+    .expense__update-form {
       display: block;
+      bottom: 50%;
+      opacity: 1;
+      transform: translate3d(-50%, 50%, 0);
+      pointer-events: auto;
     }
+  }
+}
+
+/* React Animation Triggers */
+.expense-enter,.expense-appear {
+  opacity: 0;
+
+  &&-active {
+    opacity: 1;
+    transition: opacity .5s ease-in;
+  }
+}
+
+.expense-leave {
+  opacity: 1;
+
+  &&-active {
+    opacity: 0;
+    transition: opacity 300ms ease-in;
   }
 }

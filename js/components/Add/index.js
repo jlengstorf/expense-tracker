@@ -21,6 +21,7 @@ const log = debug('components/Add');
 import Expense from '../../models/ExpenseModel';
 
 type Props = {
+  buttonText: ?string,
   expense: ?object,
   categories: object,
   people: object,
@@ -36,6 +37,9 @@ type State = {
   personID: ?string,
 };
 
+const ERROR_TYPE = 'form-error';
+const ERROR_MESSAGE = 'All fields are required for creating new expenses.';
+
 export default class Add extends Component<{}, Props, State> {
 
   constructor(props: Props): void {
@@ -50,37 +54,19 @@ export default class Add extends Component<{}, Props, State> {
     } else {
 
       // Otherwise, initializes with an empty expense
+      const {categories, people} = this.props;
+
       this.state = {
         expense: Map({
           date: moment().format('YYYY-MM-DD'),
           amount: '',
           vendor: '',
-          categoryID: false,
-          personID: false,
+          categoryID: categories.size > 0 ? categories.first().id : null,
+          personID: people.size > 0 ? people.first().id : null,
         }),
       };
-    }
-  }
 
-  componentWillReceiveProps(nextProps: Props): void {
-
-    // Starts by checking that the categoryID is valid
-    if (!this.state.expense.categoryID && nextProps.categories.size > 0) {
-      log('categoryID is false; setting manually.');
-      this.setState(({expense}) => ({
-        expense: expense.set('categoryID', nextProps.categories.first().id),
-      }));
-      log(`categoryID: ${nextProps.categories.first().id}`);
-    }
-
-    // Checks that the personID is valid
-    if (!this.state.expense.personID && nextProps.people.size > 0) {
-      log('personID is false; setting manually.');
-      log('TODO Set the personID to match the logged in user');
-      this.setState(({expense}) => ({
-        expense: expense.set('personID', nextProps.people.first().id),
-      }));
-      log(`personID: ${nextProps.people.first().id}`);
+      log('TODO Set default personID to match the logged in user');
     }
   }
 
@@ -90,20 +76,32 @@ export default class Add extends Component<{}, Props, State> {
       people,
     } = this.props;
 
+    const buttonText = this.props.buttonText || 'Add Expense';
+
+    let error;
+    if (
+      !!this.props.appState.get('error') &&
+      this.props.appState.get('error').type === ERROR_TYPE
+    ) {
+      error = (
+        <div className="form__error">
+          <p className="form__error-message">
+            {this.props.appState.get('error').message}
+          </p>
+        </div>
+      );
+    }
+
     let changeCB = this._onChange.bind(this);
     if (typeof this.props.changeHandler === 'function') {
       log('this.props.changeHandler was set');
       changeCB = this.props.changeHandler;
-    } else {
-      log('no changeHandler set');
     }
 
     let submitCB = this._onSubmit.bind(this);
     if (typeof this.props.submitHandler === 'function') {
       log('this.props.submitHandler was set');
       submitCB = this.props.submitHandler;
-    } else {
-      log('no submitHandler set');
     }
 
     return (
@@ -119,6 +117,8 @@ export default class Add extends Component<{}, Props, State> {
           label="Amount"
           name="amount"
           type="number"
+          pattern="\d+(\.\d{2})?"
+          placeholder="0.00"
           value={this.state.expense.amount}
           changeHandler={changeCB}
         />
@@ -143,8 +143,12 @@ export default class Add extends Component<{}, Props, State> {
           options={people}
           changeHandler={changeCB}
         />
-        <div>
-          <input type="submit" value="Add Expense" />
+        {error}
+        <div className="form__controls">
+          <input className="form__submit" type="submit" value={buttonText} />
+          <a href="#" className="form__cancel" onClick={this.props.cancelCB}>
+            {this.props.cancelText}
+          </a>
         </div>
       </form>
     );
@@ -156,7 +160,38 @@ export default class Add extends Component<{}, Props, State> {
     const expense = this.state.expense.toObject();
     log(expense);
 
-    // TODO add validation to make sure expenses are legit
+    // basic expense validation
+    // TODO should this live somewhere else?
+    let error = false;
+    if (
+      +expense.amount === 0 ||
+      expense.vendor === ''
+    ) {
+
+      // TODO how are errors going to work?
+      dispatch({
+        type: 'app/update-setting',
+        setting: 'error',
+        value: {
+          type: ERROR_TYPE,
+          message: ERROR_MESSAGE,
+        },
+      });
+
+      return false;
+    } else {
+
+      // if there are no errors, clear any error messages
+      dispatch({
+        type: 'app/update-setting',
+        setting: 'error',
+        value: {
+          type: false,
+          message: false,
+        },
+      });
+    }
+
     dispatch({
       type: 'expense/create',
       expense: expense,

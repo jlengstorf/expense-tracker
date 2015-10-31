@@ -8,6 +8,9 @@ import classnames from 'classnames';
 import {formatMoney} from 'accounting';
 import debug from 'debug';
 
+// addons
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
 // components
 import Add from '../Add';
 import Input from '../Form/Input';
@@ -15,6 +18,12 @@ import Select from '../Form/Select';
 
 // dispatcher
 import {dispatch} from '../../dispatcher';
+
+// types
+import type Immutable from 'immutable';
+import type {Expense as ExpenseRecord} from '../../models/ExpenseModel';
+import type Category from '../../models/CategoryModel';
+import type Person from '../../models/PersonModel';
 
 // debugger
 const log = debug('components/Expense');
@@ -30,14 +39,14 @@ function _delete(id, event) {
 
 // types
 type Props = {
-  expense: Expense,
-  categories: Map,
-  people: Map,
+  appState: Immutable.Map<string, boolean>,
+  expense: Immutable.Map<string, ExpenseRecord>,
+  categories: Immutable.Map<string, Category>,
+  people: Immutable.Map<string, Person>,
 };
 
 type State = {
-  expense: Expense,
-  isEditing: boolean,
+  expense: ExpenseRecord
 };
 
 // constants
@@ -50,7 +59,6 @@ export default class Expense extends Component<{}, Props, State> {
 
     this.state = {
       expense: this.props.expense,
-      isEditing: false,
     };
   }
 
@@ -64,13 +72,34 @@ export default class Expense extends Component<{}, Props, State> {
     const category = categories.get(this.state.expense.categoryID);
     const person = people.get(this.state.expense.personID);
 
+    const isEditing = this.props.appState.get('currentlyEditing') === this.state.expense.id;
+
     /* jscs:disable disallowQuotedKeysInObjects */
     const classes = classnames({
       'expenses__item': true,
       'expense': true,
-      'expense--editing': this.state.isEditing,
+      'expense--editing': isEditing,
     });
     /* jscs:enable disallowQuotedKeysInObjects */
+
+    let editingForm = null;
+    if (isEditing) {
+      editingForm = (
+        <div key={this.state.expense.id} className="expense__update-form">
+          <Add
+            appState={this.props.appState}
+            buttonText="Update Expense"
+            expense={this.state.expense}
+            categories={categories}
+            people={people}
+            changeHandler={this._onChange.bind(this)}
+            submitHandler={this._onSubmit.bind(this)}
+            cancelText="cancel"
+            cancelCB={this._toggleEditing.bind(this)}
+          />
+        </div>
+      );
+    }
 
     return (
       <li className={classes} onDoubleClick={this._onDoubleClick.bind(this)}>
@@ -92,35 +121,39 @@ export default class Expense extends Component<{}, Props, State> {
           </span>
         </div>
         <div className="expense__controls">
-          <button
-            className="expense__control expense__control--edit"
-            onClick={this._toggleEditing.bind(this)}
-          >
-            <span className="sr-only">
-              {(this.state.isEditing) ? 'save' : 'edit'}
-            </span>
-            <i
-              className={`fa fa-${!this.state.isEditing ? 'pencil' : 'check'}`}
-            />
-          </button>
-          <button
-            className="expense__control expense__control--delete"
-            onClick={_delete.bind(null, this.state.expense.id)}
-          >
-            <span className="sr-only">delete</span>
-            <i className="fa fa-times-circle-o" />
-          </button>
+          {this.getControlMarkup('edit')}
+          {this.getControlMarkup('delete')}
         </div>
-        <div className="expense__update-form">
-          <Add
-            expense={this.state.expense}
-            categories={categories}
-            people={people}
-            changeHandler={this._onChange.bind(this)}
-            submitHandler={this._onSubmit.bind(this)}
-          />
-        </div>
+        <ReactCSSTransitionGroup
+          transitionName="editing"
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={500}
+        >
+          {editingForm}
+        </ReactCSSTransitionGroup>
       </li>
+    );
+  }
+
+  getControlMarkup(type): ReactElement {
+    let icon;
+    let clickCB;
+
+    if (type === 'edit') {
+      icon = 'pencil';
+      clickCB = this._toggleEditing.bind(this);
+    } else {
+      icon = 'times-circle-o';
+      clickCB = _delete.bind(null, this.state.expense.id);
+    }
+
+    const classes = `expense__control expense__control--${type}`;
+
+    return (
+      <button className={classes} onClick={clickCB}>
+        <span className="sr-only">{type}</span>
+        <i className={`fa fa-${icon}`} />
+      </button>
     );
   }
 
@@ -146,20 +179,25 @@ export default class Expense extends Component<{}, Props, State> {
 
   _toggleEditing(): void {
 
+    let expenseID = this.state.expense.id;
+
     // Saves the updated expense if we were editing
-    if (this.state.isEditing) {
+    if (this.props.appState.get('currentlyEditing')) {
       dispatch({
         type: 'expense/update',
-        id: this.state.expense.id,
+        id: expenseID,
         expense: this.state.expense,
       });
+
+      // Now that the editing is done, we want to unset currentlyEditing
+      expenseID = false;
     }
 
-    this.setState({isEditing: !this.state.isEditing});
-  }
-
-  _disableEditing(): void {
-    this.setState({isEditing: false});
+    dispatch({
+      type: 'app/update-setting',
+      setting: 'currentlyEditing',
+      value: expenseID,
+    });
   }
 
   _onSubmit(event): void {
@@ -168,7 +206,7 @@ export default class Expense extends Component<{}, Props, State> {
   }
 
   _onDoubleClick(): void {
-    if (!this.state.isEditing) {
+    if (!this.props.appState.get('currentlyEditing')) {
       this._toggleEditing();
     }
   }

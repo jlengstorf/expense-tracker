@@ -4,6 +4,15 @@ export type Action =
   {
     type: 'app/initialize',
   } |
+  {
+    type: 'app/toggle-setting',
+    setting: string,
+  } |
+  {
+    type: 'app/update-setting',
+    setting: string,
+    value: string|boolean,
+  } |
 
   // EXPENSES
   {

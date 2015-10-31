@@ -1,68 +1,113 @@
 .expense {
-  position: relative;
+  display: flex;
+  align-items: top;
+  justify-content: space-between;
+  margin: 0 -20px;
+  padding: 20px;
+  border-top: 1px solid $color-lighter;
   overflow: hidden;
+  transition: 250ms all linear;
+
+  &:last-child {
+    border-bottom: 1px solid $color-lighter;
+  }
+
+  &:hover {
+    background-color: color( $color-lightest blackness(+ 2%) );
+  }
+
+  /* expense display */
+  &__display {
+    position: relative;
+    flex: 2 80%;
+    display: block;
+    margin-right: 10px;
+    padding-bottom: 20px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  &__paidby {
+    &::after {
+      content: ' paid ';
+    }
+  }
+
+  &__vendor {
+    &::before {
+      content: ' to ';
+    }
+  }
+
+  &__category {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: 10px;
+    line-height: 2;
+    color: $color-light;
+  }
 
   /* editing form */
   &__update-form {
-    position: absolute;
-    left: 50%;
-    bottom: 120vh;
-    opacity: 0;
-    transform: translate3d(-50%, 0, 0);
-    transition: 0.5s 2.5s all ease-in-out;
-    display: none;
-    width: 94vw;
-    height: 94vh;
-    padding: 4vw;
+    position: fixed;
+    left: 0;
+    top: 0;
+    /*display: none;*/
+    width: 100vw;
+    height: 100vh;
+    padding: 10vw;
     background: $color-lightest;
-    border: 2px solid color( $color-lightest blackness(+ 10%) );
-    border-radius: 10px;
-    box-shadow: 0 0 5px color($color-darkest alpha(10%) );
     pointer-events: none;
     z-index: 10;
   }
 
   /* editing controls */
   &__controls {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
+    flex: 1 20px;
+    max-width: 20px;
     margin: 0;
+    opacity: 0;
+    transition: 250ms opacity linear;
+
+    * {
+      margin: 0;
+    }
+  }
+
+  &:hover &__controls {
+    opacity: 1;
   }
 
   &__control {
-    display: inline-block;
-    width: 15px;
-    margin: 0 5px 0 0;
+    display: block;
+    width: 20px;
+    margin: 0;
     background: transparent;
     border: none;
+    color: $color-light;
     cursor: pointer;
-    font-size: 12px;
-    line-height: 24px;
+    font-size: 14px;
+    line-height: 20px;
     text-align: center;
+    transition: 250ms color linear;
+
+    &:hover,&:focus {
+      color: $color-dark;
+      outline: none;
+    }
   }
 
   /* show controls/hide spans only when editing */
   &--editing {
-    overflow: visible;
-
-    .expense__display {
-      display: none;
-    }
-
     .expense__update-form {
-      display: block;
-      bottom: 50%;
-      opacity: 1;
-      transform: translate3d(-50%, 50%, 0);
       pointer-events: auto;
     }
   }
 }
 
 /* React Animation Triggers */
-.expense-enter,.expense-appear {
+.expense-enter {
   opacity: 0;
 
   &&-active {
@@ -77,5 +122,23 @@
   &&-active {
     opacity: 0;
     transition: opacity 300ms ease-in;
+  }
+}
+
+.editing-enter {
+  left: 100vw;
+
+  &&-active {
+    left: 0;
+    transition: all 500ms ease-in-out;
+  }
+}
+
+.editing-leave {
+  left: 0;
+
+  &&-active {
+    left: 100vw;
+    transition: all 500ms ease-in-out;
   }
 }

@@ -4,6 +4,22 @@
  */
 
 /*
+ * ## Fonts
+ */
+@import 'fonts/quicksand.css';
+
+/*
+ * ## Variables
+ * Keeps site-wide settings concentrated in one place.
+ */
+$color-lightest: #FEFEFE;
+$color-lighter: #EEE;
+$color-light: #AAA;
+$color-dark: #777;
+$color-darker: #444;
+$color-darkest: #111;
+
+/*
  * ## Basic Reset
  * Not a full CSS reset; just setting some sane defaults.
  */
@@ -11,9 +27,12 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
-  font-size: 16px;
-  line-height: 24px;
+  font-family: quicksand, sans-serif;
+}
+
+body {
+  background: $color-lightest;
+  color: $color-darker;
 }
 
 /*
@@ -21,7 +40,7 @@
  * @see http://alistapart.com/article/axiomatic-css-and-lobotomized-owls
  */
 *+* {
-  margin-top: 10px;
+  margin-top: 30px;
 }
 
 header,main,footer {
@@ -42,13 +61,6 @@ header,main,footer {
   border: 0;
 }
 
-/*
- * ## Variables
- * Keeps site-wide settings concentrated in one place.
- */
-$color-lightest: #FFF;
-$color-darkest: #000;
-
 
 /*
  * ## Components
@@ -56,5 +68,105 @@ $color-darkest: #000;
  */
 
 @import './components/ExpenseTracker.css';
+@import './components/Debts.css';
 @import './components/Expenses.css';
 @import './components/Expense.css';
+
+/* Extract this to its own file */
+.form {
+  &__error {
+    margin: 20px -20px 0;
+    padding: 20px;
+    background: color(orange alpha(10%) );
+    border: 1px solid color(orange alpha(50%) );
+    border-left: none;
+    border-right: none;
+    color: orange;
+    font-size: 11px;
+    text-align: center;
+    text-shadow: 1px 1px 1px color( $color-lightest alpha(50%) );
+  }
+
+  &__input {
+    &+& {
+      margin-top: 10px;
+    }
+
+    label {
+      display: block;
+      color: $color-light;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    input,select {
+      width: 100%;
+      height: 30px;
+      padding: 5px;
+      margin-top: 0;
+      background: $color-lightest;
+      border: 1px solid $color-lighter;
+      font-size: 16px;
+      line-height: 20px;
+      transition: 250ms all linear;
+
+      &:focus {
+        border-color: $color-light;
+        outline: none;
+      }
+    }
+  }
+
+  &__controls {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  &__submit {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    background: $color-darkest;
+    border: none;
+    color: $color-lighter;
+    cursor: pointer;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 250ms all linear;
+
+    &:hover,&:focus {
+      background: $color-darker;
+      color: $color-lightest;
+      outline: none;
+    }
+  }
+
+  &__cancel {
+    display: inline-block;
+    margin-top: 15px;
+    border-bottom: 1px solid transparent;
+    color: $color-light;
+    font-size: 12px;
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+
+    &:before {
+      content: '— or —';
+      display: block;
+      margin-bottom: 10px;
+      color: $color-light;
+      font-size: 9px;
+      text-align: center;
+    }
+
+    &:hover,&:focus {
+      border-color: $color-dark;
+      color: $color-dark;
+      outline: none;
+    }
+  }
+}

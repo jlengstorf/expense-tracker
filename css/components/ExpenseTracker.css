@@ -1,4 +1,43 @@
 .expense-tracker {
-  padding: 20px;
-  border: 1px solid #eee;
+  padding: 0 20px;
+
+  &__add-form {
+
+  }
+
+  &__toggle-form {
+    display: block;
+    margin: 0 -20px;
+    padding: 20px;
+    border-top: 1px solid $color-lighter;
+    border-bottom: 1px solid $color-lighter;
+    color: $color-dark;
+    font-size: 14px;
+    font-weight: lighter;
+    letter-spacing: 0.05em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: 1.5s background linear, 1.5s letter-spacing linear;
+
+    &:hover,&:focus {
+      background: $color-lighter;
+      letter-spacing: 0.1em;
+    }
+  }
+
+  form + &__toggle-form {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    border: none;
+    transition: none;
+
+    &:hover,&:focus {
+      background: transparent;
+      letter-spacing: normal;
+      text-decoration: underline;
+      text-transform: none;
+    }
+  }
 }

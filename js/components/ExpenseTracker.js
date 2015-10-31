@@ -17,6 +17,7 @@ import type Immutable from 'immutable';
 import type Expense from '../models/ExpenseModel';
 
 // stores
+import AppStateStore from '../stores/AppStateStore';
 import ExpenseStore from '../stores/ExpenseStore';
 import CategoryStore from '../stores/CategoryStore';
 import PersonStore from '../stores/PersonStore';
@@ -31,6 +32,7 @@ const log = debug('components/ExpenseTracker');
 
 // types
 type State = {
+  appState: Immutable.Map<string, Expense>,
   expenses: Immutable.Map<string, Expense>,
   categories: Immutable.Map<string, Category>,
   people: Immutable.Map<string, Person>,
@@ -42,6 +44,7 @@ class ExpenseTracker extends Component<{}, {}, State> {
 
   static getStores(): Array<Store> {
     return [
+      AppStateStore,
       ExpenseStore,
       CategoryStore,
       PersonStore,
@@ -52,12 +55,19 @@ class ExpenseTracker extends Component<{}, {}, State> {
 
   static calculateState(prevState: ?State): Object {
     return {
+      appState: AppStateStore.getState(),
       expenses: ExpenseStore.getState(),
       categories: CategoryStore.getState(),
       people: PersonStore.getState(),
       spending: SpendingStore.getState(),
       debts: DebtStore.getState(),
     };
+  }
+
+  componentDidMount(): void {
+    // dispatch({
+    //   type: 'app/initialize',
+    // });
   }
 
   render(): ReactElement {
@@ -80,21 +90,51 @@ class ExpenseTracker extends Component<{}, {}, State> {
       );
     });
 
-    return (
-      <div className="expense-tracker">
+    let addForm;
+    if (this.state.appState.get('isFormVisible')) {
+      addForm = (
         <Add
+          appState={this.state.appState}
           categories={this.state.categories}
           people={this.state.people}
+          cancelText="done adding expenses"
+          cancelCB={this._toggleAddForm.bind(this)}
         />
+      );
+    } else {
+      addForm = (
+        <a
+          className="expense-tracker__toggle-form"
+          href="#"
+          onClick={this._toggleAddForm.bind(this)}
+        >
+          Add Expenses
+        </a>
+      );
+    }
+
+    return (
+      <div className="expense-tracker">
+        <Debts debts={this.state.debts} people={this.state.people} />
+        <div className="expense-tracker__add-form">
+          {addForm}
+        </div>
         <Expenses
+          appState={this.state.appState}
           expenses={this.state.expenses}
           categories={this.state.categories}
           people={this.state.people}
         />
         <Total expenses={this.state.expenses} />
-        <Debts debts={this.state.debts} people={this.state.people} />
       </div>
     );
+  }
+
+  _toggleAddForm(): void {
+    dispatch({
+      type: 'app/toggle-setting',
+      setting: 'isFormVisible',
+    });
   }
 
 }

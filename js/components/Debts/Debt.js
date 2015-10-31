@@ -12,7 +12,7 @@ export default function Debt(props) {
   const {debtor, lender, amount} = props;
 
   return (
-    <li>
+    <li className="debts__item">
       {debtor.fname} owes {formatMoney(amount)} to {lender.fname}.
     </li>
   );

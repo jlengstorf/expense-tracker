@@ -21,9 +21,8 @@ export default function Debts(props) {
   });
 
   return (
-    <div>
-      <h2>Who Owes Money to Whom?</h2>
-      <ul>
+    <div className="debts">
+      <ul className="debts__list">
         {debts}
       </ul>
     </div>

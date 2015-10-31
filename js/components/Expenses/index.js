@@ -16,6 +16,7 @@ const log = debug('components/Expenses');
 
 export default function Expenses(props) {
   const {
+    appState,
     expenses,
     categories,
     people,
@@ -31,7 +32,7 @@ export default function Expenses(props) {
     const newToday = moment(expense.date).format("YYYY-MM-DD");
     if (newToday !== today) {
       listItems.push(
-        <li className="expense__date-banner" key={newToday}>
+        <li className="expenses__date-banner" key={newToday}>
           {moment(expense.date).format("MMMM D, YYYY")}
         </li>
       );
@@ -43,6 +44,7 @@ export default function Expenses(props) {
     listItems.push(
       <Expense
         key={expense.id}
+        appState={appState}
         expense={expense}
         categories={categories}
         people={people}
@@ -52,9 +54,12 @@ export default function Expenses(props) {
 
   return (
     <div className="expenses">
-      <h2 className="expenses__heading">List of Expenses</h2>
       <ul className="expenses__list">
-        <ReactCSSTransitionGroup transitionName="expense" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+        <ReactCSSTransitionGroup
+          transitionName="expense"
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={500}
+        >
           {listItems}
         </ReactCSSTransitionGroup>
       </ul>

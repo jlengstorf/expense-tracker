@@ -1,0 +1,12 @@
+.debts {
+  &__list {
+    list-style: none;
+    padding: 0;
+  }
+
+  &__item {
+    margin: 0;
+    font-size: 18px;
+    /*font-weight: bold;*/
+  }
+}

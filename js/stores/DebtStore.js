@@ -121,7 +121,7 @@ function getBalances(): Object {
   totals.forEach(total => {
     const balance = toNearestCent(total.actual - total.expected);
 
-    log(`getBalances() => ${PersonStore.getState().get(total.personID).fname} — expected: ${total.expected} | actual: ${total.actual}`);
+    log(`getBalances() => ${PersonStore.getState().get(total.personID).first_name} — expected: ${total.expected} | actual: ${total.actual}`);
 
     if (balance < 1) {
       balances.owes[total.personID] = balance;

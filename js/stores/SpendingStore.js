@@ -74,7 +74,7 @@ function getSpending(state) {
       actual: getActualSpending(data),
     });
 
-    log(`getSpending() => ${person.fname} — expected: ${spending.expected} | actual: ${spending.actual}`);
+    log(`getSpending() => ${person.first_name} — expected: ${spending.expected} | actual: ${spending.actual}`);
 
     state = state.set(spending.id, spending);
   });

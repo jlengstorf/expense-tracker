@@ -6,25 +6,28 @@ import {Record} from 'immutable';
 
 const PersonRecord = Record({
   id: undefined,
-  fname: undefined,
-  lname: undefined,
+  first_name: undefined,
+  last_name: undefined,
   name: undefined,
+  email: undefined,
 });
 
 export default class Person extends PersonRecord {
   id: string;
-  fname: string;
-  lname: string;
+  first_name: string;
+  last_name: string;
   name: string;
+  email: string;
 
   constructor(person: object) {
     super({
 
       // id: uuid.v4(),
       id: person.id,
-      fname: person.fname,
-      lname: person.lname,
-      name: `${person.fname} ${person.lname}`,
+      first_name: person.first_name,
+      last_name: person.last_name,
+      name: person.name,
+      email: person.email,
     });
   }
 }

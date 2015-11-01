@@ -108,7 +108,7 @@ export default class Expense extends Component<{}, Props, State> {
           data-category={category.name}
         >
           <span className="expense__paidby">
-            {person.fname}
+            {person.first_name}
           </span>
           <span className="expense__amount">
             {formatMoney(this.state.expense.amount)}

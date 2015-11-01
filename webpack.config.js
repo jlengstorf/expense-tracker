@@ -20,16 +20,19 @@ try {
   };
 }
 
-//replaces require('config') in application js files with the
-//contents of /config/<env>.js as defined by `clientConfig`
-//key in the deployConfig file
-var clientConfig = deployConfig.clientConfig;
+/*
+ * webpack plugin to replace:
+ *
+ *     import config from 'config';
+ *
+ * with the contents of `/config/<env>.js`.
+ *
+ * The value of <env> is set in `./deploy.config.js` as `clientConfig`.
+ */
 var replaceConfig = new webpack.NormalModuleReplacementPlugin(
     /^config$/,
-    __dirname + '/config/' + clientConfig + '.js'
+    __dirname + '/config/' + deployConfig.clientConfig + '.js'
 );
-
-var publicPath = '/dist/';
 
 
 /*
@@ -65,7 +68,7 @@ module.exports = {
   output: {
     path: __dirname + '/dist',
     filename: '[name].min.js',
-    publicPath: publicPath
+    publicPath: '/dist/',
   },
 
   module: {

@@ -33,6 +33,7 @@
     "file-loader": "^0.8.4",
     "flux": "^2.1.1",
     "font-awesome": "^4.4.0",
+    "hellojs": "^1.9.6",
     "immutable": "^3.7.5",
     "jscs": "^2.4.0",
     "jscs-loader": "^0.2.0",

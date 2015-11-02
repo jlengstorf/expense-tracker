@@ -23,4 +23,21 @@ export default {
    * @return {State} An empty immutable map to replace the current state
    */
   reset: () => Map(),
+
+  /**
+   * Determines if localStorage is available for the user's browser.
+   * @return {Boolean} whether or not localStorage can be used
+   */
+  isLocalStorageSupported: () => {
+    try {
+      const storage = window.localStorage;
+      const test = '__storage-test__';
+      storage.setItem(test, test);
+      storage.removeItem(test);
+      return true;
+    } catch (e) {
+      console.warn('localStorage is not supported');
+      return false;
+    }
+  },
 };

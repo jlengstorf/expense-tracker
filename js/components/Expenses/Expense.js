@@ -85,18 +85,20 @@ export default class Expense extends Component<{}, Props, State> {
     let editingForm = null;
     if (isEditing) {
       editingForm = (
-        <div key={this.state.expense.id} className="expense__update-form">
-          <Add
-            appState={this.props.appState}
-            buttonText="Update Expense"
-            expense={this.state.expense}
-            categories={categories}
-            people={people}
-            changeHandler={this._onChange.bind(this)}
-            submitHandler={this._onSubmit.bind(this)}
-            cancelText="cancel"
-            cancelCB={this._toggleEditing.bind(this)}
-          />
+        <div key={this.state.expense.id} className="modal">
+          <div className="expense__update-form">
+            <Add
+              appState={this.props.appState}
+              buttonText="Update Expense"
+              expense={this.state.expense}
+              categories={categories}
+              people={people}
+              changeHandler={this._onChange.bind(this)}
+              submitHandler={this._onSubmit.bind(this)}
+              cancelText="cancel"
+              cancelCB={this._toggleEditing.bind(this)}
+            />
+          </div>
         </div>
       );
     }
@@ -125,9 +127,9 @@ export default class Expense extends Component<{}, Props, State> {
           {this.getControlMarkup('delete')}
         </div>
         <ReactCSSTransitionGroup
-          transitionName="editing"
-          transitionEnterTimeout={500}
-          transitionLeaveTimeout={500}
+          transitionName="modal"
+          transitionEnterTimeout={250}
+          transitionLeaveTimeout={250}
         >
           {editingForm}
         </ReactCSSTransitionGroup>

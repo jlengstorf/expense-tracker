@@ -38,6 +38,10 @@ class PersonStore extends ReduceStore<string, Person> {
         state = getPersonData(state);
         break;
 
+      case 'user/register-or-login':
+        state = registerOrLogin(state, action.data);
+        break;
+
       default:
         log(`No handler for action "${action.type}"`);
     }
@@ -47,17 +51,44 @@ class PersonStore extends ReduceStore<string, Person> {
 
 }
 
+function registerOrLogin(state, data) {
+
+  log('registerOrLogin()');
+
+  // checks for an existing user and does nothing if the user exists
+  if (state.find(user => user.email === data.email)) {
+    log('user already exists!');
+    return state;
+  }
+
+  // if the user doesn't exist, checks for required data and creates one
+  if (!!data.first_name && !!data.last_name && !!data.name && !!data.email) {
+    log('user does not exist; creating');
+    const person = new Person(data);
+    return state.set(person.id, person);
+  }
+
+  // if we get here, something went wrong
+  log('something went wrong in registerOrLogin()');
+  log(state);
+  log(data);
+}
+
 // TODO Move this to a database
 const tempPeople = [
   {
     id: '0ba081f6-9261-4c16-8476-9049165a7f04',
-    fname: 'Jason',
-    lname: 'Lengstorf',
+    first_name: 'Jason',
+    last_name: 'Lengstorf',
+    name: 'Jason Lengstorf',
+    email: 'jason@lengstorf.com',
   },
   {
     id: '6db0719a-603d-4986-8366-5bb6824ef9c2',
-    fname: 'Marisa',
-    lname: 'Morby',
+    first_name: 'Marisa',
+    last_name: 'Morby',
+    name: 'Marisa Morby',
+    email: 'me@marisamorby.com',
   },
 ];
 

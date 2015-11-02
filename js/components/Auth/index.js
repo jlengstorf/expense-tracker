@@ -6,94 +6,103 @@ import React from 'react';
 import hello from 'hellojs';
 import debug from 'debug';
 
+// config
 import config from 'config';
+
+// addons
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
+// components
+import Login from './Login';
 
 // dispatcher
 import {dispatch} from '../../dispatcher';
 
+// helpers
+import {ucfirst} from '../../helpers/string';
+
 // debugger
 const log = debug('components/Auth');
 
-const networks = [
-  {
-    name: 'facebook',
-    label: 'Log in with Facebook',
-  },
-  {
-    name: 'google',
-    label: 'Log in with Google',
-  },
-  {
-    name: 'twitter',
-    label: 'Log in with Twitter',
-  },
-];
-
 // stateless React component
 export default function Auth(props) {
-
-  // Loops through networks and builds buttons
-  const buttons = networks.map(network => {
-    const loginCB = _login.bind(null, network.name);
-    const logoutCB = _logout.bind(null, network.name);
-
-    return (
-      <div key={network.name}>
-        <button onClick={loginCB}>
-          {network.label}
-        </button>
-        <button onClick={logoutCB}>
-          {network.name} logout
-        </button>
-      </div>
-    );
-  });
-
   let loginStatus;
   if (props.appState.get('user')) {
     const user = props.appState.get('user');
     loginStatus = (
-      <p>Logged in as {user.name}.</p>
+      <p>
+        Logged in as {user.name}. (
+          <a
+            href="#"
+            onClick={_logout.bind(null, props.appState.get('loggedInWith'))}
+          >log out</a>
+        )
+      </p>
     );
+  } else {
+    loginStatus = (
+      <p><a href="#" onClick={_showLogin}>login or register</a></p>
+    );
+  }
+
+  let loginButtons;
+  if (props.appState.get('isLoginVisible')) {
+    loginButtons = (<Login cancelCB={_hideLogin} appState={props.appState} />);
   }
 
   return (
     <div className="auth">
       {loginStatus}
-      {buttons}
+      <ReactCSSTransitionGroup
+        transitionName="modal"
+        transitionEnterTimeout={250}
+        transitionLeaveTimeout={250}
+      >
+        {loginButtons}
+      </ReactCSSTransitionGroup>
     </div>
   );
 }
 
 // pure helpers
-function _login(network, event) {
+function _showLogin(event) {
   event.preventDefault();
 
-  hello(network).login({scope: 'email'})
-    .then(log, log);
+  dispatch({
+    type: 'app/show-login',
+  });
+}
+
+function _hideLogin(event) {
+  event.preventDefault();
+
+  dispatch({
+    type: 'app/hide-login',
+  });
 }
 
 function _logout(network, event) {
   event.preventDefault();
 
-  hello(network).logout()
-    .then(log, log);
+  hello(network).logout().then(() => {
+    dispatch({
+      type: 'user/logout',
+    });
+  });
 }
 
+// listeners and initialization for hello.js
 hello.on('auth.login', auth => {
   hello(auth.network).api('/me').then(result => {
 
     // Dispatches the info for processing
     dispatch({
       type: 'user/register-or-login',
+      network: auth.network,
       data: result,
     });
 
   });
 });
 
-hello.init({
-  facebook: config.auth.FACEBOOK_APP_ID,
-  google: config.auth.GOOGLE_APP_ID,
-  twitter: config.auth.TWITTER_APP_ID,
-}, {redirect_uri: 'redirect.html'});
+hello.init(config.oauth.networks, config.oauth.settings.init);

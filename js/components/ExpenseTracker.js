@@ -11,6 +11,7 @@ import Add from './Add';
 import Expenses from './Expenses';
 import Total from './Total';
 import Debts from './Debts';
+import Auth from './Auth';
 
 // models
 import type Immutable from 'immutable';
@@ -115,6 +116,7 @@ class ExpenseTracker extends Component<{}, {}, State> {
 
     return (
       <div className="expense-tracker">
+        <Auth appState={this.state.appState} />
         <Debts debts={this.state.debts} people={this.state.people} />
         <div className="expense-tracker__add-form">
           {addForm}

@@ -1,16 +1,20 @@
 /*
  * # main.css
  * Master stylesheet for the app, which loads in all other styles.
+ *
+ * This stylesheet depends on PostCSS to function properly. It also makes the
+ * assumption that older browsers won't be able to support the app at all, so
+ * the styles don't bother trying to go back too far.
  */
 
-/*
- * ## Fonts
- */
-@import 'fonts/quicksand.css';
 
 /*
  * ## Variables
  * Keeps site-wide settings concentrated in one place.
+ */
+
+/*
+ * ### Color Variables
  */
 $color-lightest: #FEFEFE;
 $color-lighter: #EEE;
@@ -18,6 +22,27 @@ $color-light: #AAA;
 $color-dark: #777;
 $color-darker: #444;
 $color-darkest: #111;
+
+$color-brand: #29A0E2;
+
+/*
+ * ### Measurement Variables
+ */
+$border-width: 1px;
+$border-width-heavy: 2px;
+$border-radius: 1rem;
+
+/*
+ * ### Typography Variables
+ */
+$font-family-base: 'quicksand', sans-serif;
+$font-family-heading: sans-serif;
+$font-weight-base: normal;
+$font-weight-bold: bold;
+$font-weight-light: lighter;
+$line-height-base: 1.375;
+$font-size-small: 75%;
+
 
 /*
  * ## Basic Reset
@@ -27,12 +52,6 @@ $color-darkest: #111;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: quicksand, sans-serif;
-}
-
-body {
-  background: $color-lightest;
-  color: $color-darker;
 }
 
 /*
@@ -40,9 +59,45 @@ body {
  * @see http://alistapart.com/article/axiomatic-css-and-lobotomized-owls
  */
 *+* {
-  margin-top: 30px;
+  margin-top: 1.5rem;
 }
 
+body {
+  background: $color-lightest;
+  color: $color-darker;
+}
+
+
+/*
+ * ## Typography
+ * Web fonts and font baselines.
+ */
+
+/*
+ * ### Web Fonts
+ * Quicksand is from http://www.fontsquirrel.com/fonts/quicksand
+ */
+@import 'fonts/quicksand.css';
+
+/*
+ * ### Typography Baseline Settings
+ * Vertical rhythm, font sizes, etc.
+ */
+html {
+  font-family: $font-family-base;
+  font-weight: $font-weight-base;
+  line-height: $line-height-base;
+}
+
+
+/*
+ * ## Common Styles
+ * Pieces that are used in multiple places.
+ */
+
+/*
+ * TODO: Make this less terrible.
+ */
 header,main,footer {
   display: block;
   max-width: 768px;
@@ -50,6 +105,10 @@ header,main,footer {
   margin-right: auto;
 }
 
+/*
+ * ### Accessibility Helper
+ * Borrowed from Bootstrap. Allows for accessible content that's hidden.
+ */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -61,6 +120,123 @@ header,main,footer {
   border: 0;
 }
 
+/*
+ * ### Modal Windows
+ * Several parts of the app display content in a modal overlay.
+ */
+.modal {
+
+  /*
+   * Modals should fill the screen above all other content. No scrolling.
+   */
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: $color-lightest;
+  z-index: 10;
+
+  /*
+   * Keeps the modal content from sticking to the edges of the viewport.
+   */
+  padding: 10vw;
+
+  /*
+   * Ensures that modal content is always vertically/horizontally centered.
+   */
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  > div { flex: 1 100%; }
+
+  /*
+   * Adds a loading modal to show activity
+   */
+  > .loading {
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: color( $color-brand alpha(90%) );
+      z-index: 5;
+    }
+
+    &::after {
+      content: '\f110';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      color: $color-lightest;
+      font-family: fontawesome;
+      font-size: 5rem;
+      text-shadow: 0 0 2px color( $color-brand blackness(+ 5%) );
+      animation: 1s loader infinite linear;
+      z-index: 10;
+    }
+  }
+
+  /*
+   * Modals are brought in using `ReactCSSTransitionGroup`.
+   * @see https://facebook.github.io/react/docs/animation.html
+   */
+  transition: 250ms left ease-in-out;
+
+  &-enter {
+    left: 100vw;
+
+    &&-active { left: 0; }
+  }
+
+  &-leave {
+    left: 0;
+
+    &&-active { left: 100vw; }
+  }
+
+  /*
+   * Consistent styling for closing modals. This style should only be applied
+   * to a link that triggers the modal close action.
+   *
+   * A React-style example:
+   *     <a href="#" onClick={cancelCB} className="modal__close">cancel</a>
+   */
+  &__close {
+    display: inline-block;
+    margin-top: 15px;
+    border-bottom: $border-width solid transparent;
+    color: $color-light;
+    font-size: $font-size-small;
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+
+    &:before {
+      content: '— or —';
+      display: block;
+      margin-bottom: 10px;
+      color: $color-light;
+      font-size: 9px;
+      text-align: center;
+    }
+
+    &:hover,&:focus {
+      border-color: $color-dark;
+      color: $color-dark;
+      outline: none;
+    }
+  }
+}
+
+@keyframes loader {
+    0% { transform: translate3d(-50%, -50%, 0) rotate(  0deg); }
+  100% { transform: translate3d(-50%, -50%, 0) rotate(360deg); }
+}
 
 /*
  * ## Components
@@ -72,13 +248,16 @@ header,main,footer {
 @import './components/Expenses.css';
 @import './components/Expense.css';
 
-/* Extract this to its own file */
+
+/*
+ * ### Form Display
+ */
 .form {
   &__error {
     margin: 20px -20px 0;
     padding: 20px;
     background: color(orange alpha(10%) );
-    border: 1px solid color(orange alpha(50%) );
+    border: $border-width solid color(orange alpha(50%) );
     border-left: none;
     border-right: none;
     color: orange;
@@ -105,7 +284,7 @@ header,main,footer {
       padding: 5px;
       margin-top: 0;
       background: $color-lightest;
-      border: 1px solid $color-lighter;
+      border: $border-width solid $color-lighter;
       font-size: 16px;
       line-height: 20px;
       transition: 250ms all linear;
@@ -166,6 +345,76 @@ header,main,footer {
     &:hover,&:focus {
       border-color: $color-dark;
       color: $color-dark;
+      outline: none;
+    }
+  }
+}
+
+/*
+ * ### Authentication
+ */
+.auth {
+
+  &__login {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  &__button {
+    flex: 1 100%;
+  }
+}
+
+
+/*
+ * ### Buttons
+ */
+.button {
+  margin: 1rem 0 0;
+  padding: 0.5rem;
+  border: $border-width solid $color-dark;
+  color: $color-lightest;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  text-align: left;
+  transition: 250ms all linear;
+
+  /*
+   * Buttons support icons via a modifier class (see below).
+   */
+  &::before {
+    display: inline-block;
+    border-right: $border-width solid color( $color-lighter alpha(25%) );
+    margin-right: 0.5rem;
+    padding: 0.5rem;
+    font-family: fontawesome;
+    font-size: 1.1rem;
+  }
+
+  &--facebook {
+    background-color: #3b5998;
+    border-color: color( #3b5998 blackness(+ 5%) );
+
+    &::before { content: '\f09a'; }
+
+    &:hover,&:focus {
+      background-color: color( #3b5998 blackness(+ 20%) );
+      border-color: color( #3b5998 blackness(+ 25%) );
+      outline: none;
+    }
+  }
+
+  &--google {
+    background-color: #d50f25;
+    border-color: color( #d50f25 blackness(+ 5%) );
+    &::before { content: '\f1a0'; }
+
+    &:hover,&:focus {
+      background-color: color( #d50f25 blackness(+ 15%) );
+      border-color: color( #d50f25 blackness(+ 20%) );
       outline: none;
     }
   }

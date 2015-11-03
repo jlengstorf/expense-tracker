@@ -20,6 +20,7 @@ import type Expense from '../models/ExpenseModel';
 // stores
 import AppStateStore from '../stores/AppStateStore';
 import ExpenseStore from '../stores/ExpenseStore';
+import GroupStore from '../stores/GroupStore';
 import CategoryStore from '../stores/CategoryStore';
 import PersonStore from '../stores/PersonStore';
 import SpendingStore from '../stores/SpendingStore';
@@ -35,6 +36,7 @@ const log = debug('components/ExpenseTracker');
 type State = {
   appState: Immutable.Map<string, Expense>,
   expenses: Immutable.Map<string, Expense>,
+  groups: Immutable.Map<string, Group>,
   categories: Immutable.Map<string, Category>,
   people: Immutable.Map<string, Person>,
   spending: Immutable.Map<string, Spending>,
@@ -47,6 +49,7 @@ class ExpenseTracker extends Component<{}, {}, State> {
     return [
       AppStateStore,
       ExpenseStore,
+      GroupStore,
       CategoryStore,
       PersonStore,
       SpendingStore,
@@ -58,6 +61,7 @@ class ExpenseTracker extends Component<{}, {}, State> {
     return {
       appState: AppStateStore.getState(),
       expenses: ExpenseStore.getState(),
+      groups: GroupStore.getState(),
       categories: CategoryStore.getState(),
       people: PersonStore.getState(),
       spending: SpendingStore.getState(),
@@ -72,25 +76,6 @@ class ExpenseTracker extends Component<{}, {}, State> {
   }
 
   render(): ReactElement {
-    let categories = [];
-    this.state.spending.valueSeq().map(category => {
-      let splits = [];
-      category.split.map(split => {
-        const {name, portion, percent} = split;
-        splits[category.id + name] = (
-          <span key={category.id + name}>
-            {name} pays {portion} [{percent}%]
-          </span>
-        );
-      });
-
-      categories[category.id] = (
-        <p key={category.id}>
-          Category: {category.name} ({splits.join(', ')})
-        </p>
-      );
-    });
-
     let addForm;
     if (this.state.appState.get('isFormVisible')) {
       addForm = (

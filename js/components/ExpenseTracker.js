@@ -70,9 +70,9 @@ class ExpenseTracker extends Component<{}, {}, State> {
   }
 
   componentDidMount(): void {
-    // dispatch({
-    //   type: 'app/initialize',
-    // });
+    dispatch({
+      type: 'app/initialize',
+    });
   }
 
   render(): ReactElement {
@@ -102,19 +102,20 @@ class ExpenseTracker extends Component<{}, {}, State> {
     return (
       <div className="expense-tracker">
         <Auth appState={this.state.appState} />
-        <Debts debts={this.state.debts} people={this.state.people} />
-        <div className="expense-tracker__add-form">
-          {addForm}
-        </div>
-        <Expenses
-          appState={this.state.appState}
-          expenses={this.state.expenses}
-          categories={this.state.categories}
-          people={this.state.people}
-        />
-        <Total expenses={this.state.expenses} />
       </div>
     );
+
+    // <Debts debts={this.state.debts} people={this.state.people} />
+    // <div className="expense-tracker__add-form">
+    //   {addForm}
+    // </div>
+    // <Expenses
+    //   appState={this.state.appState}
+    //   expenses={this.state.expenses}
+    //   categories={this.state.categories}
+    //   people={this.state.people}
+    // />
+    // <Total expenses={this.state.expenses} />
   }
 
   _toggleAddForm(): void {

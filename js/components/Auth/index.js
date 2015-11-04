@@ -27,14 +27,15 @@ const log = debug('components/Auth');
 // stateless React component
 export default function Auth(props) {
   let loginStatus;
-  if (props.appState.get('user')) {
-    const user = props.appState.get('user');
+  if (props.appState.getIn(['oauth', 'user'])) {
+    const user = props.appState.getIn(['oauth', 'user']);
+    const network = props.appState.getIn(['oauth', 'network']);
     loginStatus = (
       <p>
         Logged in as {user.name}. (
           <a
             href="#"
-            onClick={_logout.bind(null, props.appState.get('loggedInWith'))}
+            onClick={_logout.bind(null, network)}
           >log out</a>
         )
       </p>
@@ -46,7 +47,7 @@ export default function Auth(props) {
   }
 
   let loginButtons;
-  if (props.appState.get('isLoginVisible')) {
+  if (props.appState.getIn(['oauth', 'showLogin'])) {
     loginButtons = (<Login cancelCB={_hideLogin} appState={props.appState} />);
   }
 
@@ -97,7 +98,7 @@ hello.on('auth.login', auth => {
 
     // Dispatches the info for processing
     dispatch({
-      type: 'user/register-or-login',
+      type: 'user/oauth-succeeded',
       network: auth.network,
       data: result,
     });

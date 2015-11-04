@@ -21,9 +21,7 @@ export default class Person extends PersonRecord {
 
   constructor(person: object) {
     super({
-
-      // id: uuid.v4(),
-      id: person.id,
+      id: person.id || uuid.v4(),
       first_name: person.first_name,
       last_name: person.last_name,
       name: person.name,

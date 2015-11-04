@@ -25,7 +25,7 @@ export default function Login(props) {
 
   const classes = classnames({
     auth__login: true,
-    loading: props.appState.get('isModalLoading'),
+    loading: props.appState.getIn(['oauth', 'loading']),
   });
 
   return (
@@ -62,11 +62,7 @@ function _login(network, event) {
   event.preventDefault();
 
   // Adds an overlay to the login window to show activity
-  dispatch({
-    type: 'app/update-setting',
-    setting: 'isModalLoading',
-    value: true,
-  });
+  dispatch({type: 'user/oauth-pending'});
 
   hello(network).login(config.oauth.settings.login);
 }

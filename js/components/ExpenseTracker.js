@@ -105,19 +105,32 @@ class ExpenseTracker extends Component<{}, {}, State> {
       );
     }
 
+    let pageDisplay;
+    if (this.state.appState.getIn(['view', 'page'])) {
+      const view = this.state.appState.getIn(['view', 'page']);
+
+      let id;
+      if (this.state.appState.getIn(['view', 'params']).id) {
+        id = this.state.appState.getIn(['view', 'params']).id;
+      }
+
+      const pageData = id ? <p>{id}</p> : '';
+
+      pageDisplay = (
+        <div>
+          <h1>{view}</h1>
+          {pageData}
+        </div>
+      );
+    }
+
     return (
       <div className="expense-tracker">
         <Auth appState={this.state.appState} />
         <a onClick={this._navigate.bind(null, '/test')}>test</a>
         <a onClick={this._navigate.bind(null, '/home')}>home</a>
 
-        {this.state.appState.get('view') === 'home' &&
-          <h1>Home</h1>
-        }
-
-        {this.state.appState.get('view') === 'test' &&
-          <h1>Test</h1>
-        }
+        {pageDisplay}
       </div>
     );
 

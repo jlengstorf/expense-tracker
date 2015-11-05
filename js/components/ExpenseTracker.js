@@ -4,7 +4,13 @@
 // // libs
 import React, {Component} from 'react';
 import {Container} from 'flux/utils';
+import Aviator from 'aviator';
 import debug from 'debug';
+
+// router
+import Router, {routeConfig} from '../router';
+Aviator.setRoutes(routeConfig);
+Aviator.dispatch();
 
 // components
 import Add from './Add';
@@ -102,6 +108,16 @@ class ExpenseTracker extends Component<{}, {}, State> {
     return (
       <div className="expense-tracker">
         <Auth appState={this.state.appState} />
+        <a onClick={this._navigate.bind(null, '/test')}>test</a>
+        <a onClick={this._navigate.bind(null, '/home')}>home</a>
+
+        {this.state.appState.get('view') === 'home' &&
+          <h1>Home</h1>
+        }
+
+        {this.state.appState.get('view') === 'test' &&
+          <h1>Test</h1>
+        }
       </div>
     );
 
@@ -123,6 +139,10 @@ class ExpenseTracker extends Component<{}, {}, State> {
       type: 'app/toggle-setting',
       setting: 'isFormVisible',
     });
+  }
+
+  _navigate(uri): void {
+    Aviator.navigate(uri);
   }
 
 }

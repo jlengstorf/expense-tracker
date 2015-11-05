@@ -3,7 +3,7 @@
 
 // libs
 import {Map} from 'immutable';
-import {ReduceStore} from 'flux/utils';
+import {MapStore} from 'flux/utils';
 import debug from 'debug';
 
 // types
@@ -20,14 +20,14 @@ import PersonStore from '../stores/PersonStore';
 import {reset} from '../helpers/data';
 
 // types
-type State = Immutable.Map<string, boolean>;
+type State = Immutable.Map<string, mixed>;
 
 // debugger
 const log = debug('store/AppStateStore');
 
-class AppStateStore extends ReduceStore<string, boolean> {
+class AppStateStore extends MapStore<string, boolean> {
 
-  getInitialState(): State {
+  /*getInitialState(): State {
     return Map({
       oauth: {
         showLogin: false,
@@ -42,7 +42,7 @@ class AppStateStore extends ReduceStore<string, boolean> {
         message: false,
       },
     });
-  }
+  }*/
 
   reduce(state: State, action: Action): State {
     switch (action.type) {
@@ -56,6 +56,10 @@ class AppStateStore extends ReduceStore<string, boolean> {
 
       case 'app/hide-login':
         state = state.setIn(['oauth', 'showLogin'], false);
+        break;
+
+      case 'nav/change-view':
+        state = state.set('view', action.view);
         break;
 
       case 'user/oauth-pending':
@@ -122,6 +126,7 @@ function setLoggedInUser(state, data) {
 
   // checks if the logged in user is in the PersonStore
   const person = PersonStore.getState().find(user => user.email === data.email);
+  log(person);
   if (person) {
     return state.setIn(['oauth', 'user'], person);
   } else {

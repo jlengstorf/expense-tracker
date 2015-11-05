@@ -89,7 +89,7 @@ class PersonStore extends MapStore<string, Person> {
 
         break;
 
-      // No op for unspecified actions.
+      // No op for unhandled actions.
       default:
         log(`No handler for action "${action.type}"`);
     }

@@ -59,7 +59,9 @@ class AppStateStore extends MapStore<string, boolean> {
         break;
 
       case 'nav/change-view':
-        state = state.set('view', action.view);
+        state = state.setIn(['view', 'page'], action.view);
+        state = state.setIn(['view', 'params'], action.params);
+        log(state);
         break;
 
       case 'user/oauth-pending':

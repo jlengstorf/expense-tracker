@@ -82,53 +82,31 @@ class ExpenseTracker extends Component<{}, {}, State> {
   }
 
   render(): ReactElement {
-    let addForm;
-    if (this.state.appState.get('isFormVisible')) {
-      addForm = (
-        <Add
-          appState={this.state.appState}
-          categories={this.state.categories}
-          people={this.state.people}
-          cancelText="done adding expenses"
-          cancelCB={this._toggleAddForm.bind(this)}
-        />
+    const pageDisplay = this._renderView();
+
+    // TODO Make the nav its own component
+    const navLinks = [
+      {name: 'Home', uri: '/home'},
+      {name: 'Groups', uri: '/groups'},
+      {name: 'Account', uri: '/account'},
+      {name: 'Group Expenses', uri: '/1234/expenses'},
+      {name: 'Group Categories', uri: '/1234/categories'},
+      {name: 'Group Settings', uri: '/1234/settings'},
+    ].map(link => {
+      return (
+        <li key={link.uri}>
+          <a href={link.uri} onClick={this._navigate.bind(null, link.uri)}>
+            {link.name}
+          </a>
+        </li>
       );
-    } else {
-      addForm = (
-        <a
-          className="expense-tracker__toggle-form"
-          href="#"
-          onClick={this._toggleAddForm.bind(this)}
-        >
-          Add Expenses
-        </a>
-      );
-    }
-
-    let pageDisplay;
-    if (this.state.appState.getIn(['view', 'page'])) {
-      const view = this.state.appState.getIn(['view', 'page']);
-
-      let id;
-      if (this.state.appState.getIn(['view', 'params']).id) {
-        id = this.state.appState.getIn(['view', 'params']).id;
-      }
-
-      const pageData = id ? <p>{id}</p> : '';
-
-      pageDisplay = (
-        <div>
-          <h1>{view}</h1>
-          {pageData}
-        </div>
-      );
-    }
+    });
 
     return (
       <div className="expense-tracker">
-        <Auth appState={this.state.appState} />
-        <a onClick={this._navigate.bind(null, '/test')}>test</a>
-        <a onClick={this._navigate.bind(null, '/home')}>home</a>
+        <ul>
+          {navLinks}
+        </ul>
 
         {pageDisplay}
       </div>
@@ -154,11 +132,101 @@ class ExpenseTracker extends Component<{}, {}, State> {
     });
   }
 
-  _navigate(uri): void {
+  _navigate(uri, event): void {
+    event.preventDefault();
     Aviator.navigate(uri);
+  }
+
+  _renderView() {
+    const view = this.state.appState.getIn(['view', 'page']);
+    const params = this.state.appState.getIn(['view', 'params']);
+
+    /*
+     * We start with an empty array to ensure that there's always something to
+     * return from the function.
+     */
+    let components = [];
+
+    /*
+     * Based on the current view, we can configure which components are visible
+     * in the UI.
+     */
+    switch (view) {
+
+      case 'home':
+        components.push(<h1 key={`heading-${view}`}>Home</h1>);
+        break;
+
+      case 'groups':
+        components.push(<h1 key={`heading-${view}`}>Groups</h1>);
+        break;
+
+      case 'account':
+        components.push(<h1 key={`heading-${view}`}>Account</h1>);
+        break;
+
+      case 'expenses':
+        components.push(<h1 key={`heading-${view}`}>Expenses</h1>);
+        components.push(<p key={`id-${view}`}>Group ID: {params.group_id}</p>);
+        break;
+
+      case 'categories':
+        components.push(<h1 key={`heading-${view}`}>Categories</h1>);
+        components.push(<p key={`id-${view}`}>Group ID: {params.group_id}</p>);
+        break;
+
+      case 'settings':
+        components.push(<h1 key={`heading-${view}`}>Group Settings</h1>);
+        components.push(<p key={`id-${view}`}>Group ID: {params.group_id}</p>);
+        break;
+
+      // By default, show the login component only
+      case 'login':
+      default:
+        components.push(<Auth appState={this.state.appState} />);
+        break;
+
+    }
+
+    return components;
+  }
+
+  /*
+   * TODO decide if this needs to live somewhere else
+   */
+  _showAddExpenseForm() {
+    let addForm;
+    if (this.state.appState.get('isFormVisible')) {
+      addForm = (
+        <Add
+          appState={this.state.appState}
+          categories={this.state.categories}
+          people={this.state.people}
+          cancelText="done adding expenses"
+          cancelCB={this._toggleAddForm.bind(this)}
+        />
+      );
+    } else {
+      addForm = (
+        <a
+          className="expense-tracker__toggle-form"
+          href="#"
+          onClick={this._toggleAddForm.bind(this)}
+        >
+          Add Expenses
+        </a>
+      );
+    }
+
+    return addForm;
   }
 
 }
 
+/*
+ * This component is a Container (of the fluxutils variety), which means it has
+ * a two-way binding with the stores listed in `getStores()`. This is a
+ * shortcut for setting up event emitters explicitly for each store.
+ */
 const ExpenseTrackerContainer = Container.create(ExpenseTracker);
 export default ExpenseTrackerContainer;

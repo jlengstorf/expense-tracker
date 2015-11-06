@@ -19,9 +19,7 @@ export default class Group extends GroupRecord {
 
   constructor(group: object) {
     super({
-
-      // id: uuid.v4(),
-      id: group.id,
+      id: group.id || uuid.v4(),
       name: group.name,
       owner: group.owner,
       members: group.members,

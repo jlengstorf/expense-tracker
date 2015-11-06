@@ -4,9 +4,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-// dispatcher
-import {dispatch} from './dispatcher';
-
 // components
 import ExpenseTracker from './components/ExpenseTracker';
 
@@ -18,7 +15,3 @@ ReactDOM.render(
   <ExpenseTracker />,
   document.getElementById('expense-tracker')
 );
-
-dispatch({
-  type: 'app/initialize',
-});

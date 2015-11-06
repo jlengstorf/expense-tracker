@@ -3,7 +3,7 @@
 
 // libs
 import {Map} from 'immutable';
-import {ReduceStore} from 'flux/utils';
+import {MapStore} from 'flux/utils';
 import debug from 'debug';
 
 // types
@@ -11,7 +11,7 @@ import type Immutable from 'immutable';
 
 // flux infrastructure
 import type Action from '../actions';
-import Dispatcher from '../dispatcher';
+import Dispatcher, {dispatch} from '../dispatcher';
 
 // stores
 import PersonStore from '../stores/PersonStore';
@@ -20,19 +20,21 @@ import PersonStore from '../stores/PersonStore';
 import {reset} from '../helpers/data';
 
 // types
-type State = Immutable.Map<string, boolean>;
+type State = Immutable.Map<string, mixed>;
 
 // debugger
 const log = debug('store/AppStateStore');
 
-class AppStateStore extends ReduceStore<string, boolean> {
+class AppStateStore extends MapStore<string, boolean> {
 
-  getInitialState(): State {
+  /*getInitialState(): State {
     return Map({
-      isLoginVisible: false,
-      isModalLoading: false,
-      loggedInWith: false,
-      user: false,
+      oauth: {
+        showLogin: false,
+        loading: false,
+        network: false,
+        user: false,
+      },
       isFormVisible: false,
       currentlyEditing: false,
       error: {
@@ -40,7 +42,7 @@ class AppStateStore extends ReduceStore<string, boolean> {
         message: false,
       },
     });
-  }
+  }*/
 
   reduce(state: State, action: Action): State {
     switch (action.type) {
@@ -49,20 +51,54 @@ class AppStateStore extends ReduceStore<string, boolean> {
         break;
 
       case 'app/show-login':
-        state = state.set('isLoginVisible', true);
+        state = state.setIn(['oauth', 'showLogin'], true);
         break;
 
       case 'app/hide-login':
-        state = state.set('isLoginVisible', false);
+        state = state.setIn(['oauth', 'showLogin'], false);
         break;
 
-      case 'user/register-or-login':
+      case 'nav/change-view':
+        state = state.setIn(['view', 'page'], action.view);
+        state = state.setIn(['view', 'params'], action.params);
+        log(state);
+        break;
+
+      case 'user/oauth-pending':
+        state = state.setIn(['oauth', 'loading'], true);
+        break;
+
+      case 'user/oauth-succeeded':
         this.getDispatcher().waitFor([
           PersonStore.getDispatchToken(),
         ]);
-        state = reset();
-        state = state.set('loggedInWith', action.network);
-        state = setLoggedInUser(state, action.data);
+
+        // keeps a record of which network was used to log in (for logout)
+        state = state.setIn(['oauth', 'network'], action.network);
+        state = state.setIn(['oauth', 'showLogin'], false);
+        state = state.setIn(['oauth', 'loading'], false);
+        break;
+
+      case 'user/data-loaded':
+        this.getDispatcher().waitFor([
+          PersonStore.getDispatchToken(),
+        ]);
+
+        try {
+
+          // stores the logged in user in the state
+          state = setLoggedInUser(state, action.data);
+          log(state);
+        } catch (error) {
+          log('error logging in');
+          log(error);
+
+          // goes back to a clean slate if anything goes wrong
+          // TODO make sure a full reset is necessary
+          // TODO add a helpful error message of some sort
+          state = reset();
+        }
+
         break;
 
       case 'user/logout':
@@ -87,10 +123,19 @@ class AppStateStore extends ReduceStore<string, boolean> {
 }
 
 function setLoggedInUser(state, data) {
-  const people = PersonStore.getState();
-  const user = people.find(person => person.email === data.email);
 
-  return state.set('user', user);
+  log('setLoggedInUser()');
+
+  // checks if the logged in user is in the PersonStore
+  const person = PersonStore.getState().find(user => user.email === data.email);
+  log(person);
+  if (person) {
+    return state.setIn(['oauth', 'user'], person);
+  } else {
+    log('invalid user data');
+    log(data);
+    throw Error('The supplied user data is invalid.');
+  }
 }
 
 const instance = new AppStateStore(Dispatcher);

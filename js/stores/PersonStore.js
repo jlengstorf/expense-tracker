@@ -56,6 +56,7 @@ class PersonStore extends MapStore<string, Person> {
        * If the user's email _is_ in the database, then we skip ahead to step 3.
        */
       case 'user/oauth-succeeded':
+        state = state.set('isLoading', true);
         state = getPersonByEmail(state, action.data);
         break;
 
@@ -169,8 +170,8 @@ function getPersonByEmail(state: State, person: Object): State {
       });
   }
 
-  // Return state even if the user isn't loaded to avoid an invariant violation
-  return state;
+  // Set the state to loading
+  return state.set('isLoading', true);
 }
 
 /**
@@ -186,6 +187,7 @@ function savePersonToState(state: State, data: Object): State {
 
     // If required data is there, creates a new Person record and stores it.
     const person = new Person(data);
+    state = state.delete('isLoading');
     return state.set(person.id, person);
   } else {
 
@@ -233,8 +235,7 @@ function savePersonToDB(state: State, data: Object): State {
   }
 
   /*
-   * Because this is an async operation, just return the state as-is. It will
-   * be modified later, when the `user/data-loaded `action is dispatched.
+   * Because this is an async operation, just return the state.
    */
   return state;
 }

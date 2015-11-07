@@ -2,5 +2,6 @@
     "preset": "airbnb",
     "fileExtensions": [".js", "jscs"],
     "validateQuoteMarks": false,
-    "requireCamelCaseOrUpperCaseIdentifiers": false
+    "requireCamelCaseOrUpperCaseIdentifiers": false,
+    "disallowQuotedKeysInObjects": false
 }

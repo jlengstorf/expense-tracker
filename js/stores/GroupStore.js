@@ -77,6 +77,7 @@ class GroupStore extends MapStore<string, Group> {
        */
       case 'group/group-loaded':
         try {
+          state = state.delete('isLoading');
           state = saveGroupToState(state, action.group);
         } catch (error) {
           log(error);
@@ -164,8 +165,11 @@ function getGroupByOwner(state: State, ownerID: string): State {
       });
   }
 
-  // Return state even if the user isn't loaded to avoid an invariant violation
-  return state;
+  /*
+   * Because this is an async operation, set a loading flag in the state. It
+   * will be unset by the `group/group-loaded` action once it's dispatched.
+   */
+  return state.set('isLoading', true);
 }
 
 /**

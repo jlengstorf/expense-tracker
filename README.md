@@ -14,13 +14,10 @@ This is something I need, because my girlfriend and I use an income-based split 
 
 ## Development
 
-This app is built with React (using Flux). The whole thing is packaged up using Webpack, so it's a JS-required app.
+This app uses [React](https://facebook.github.io/react/) with the [Flux](https://facebook.github.io/flux/) (using [Flux Utils](https://facebook.github.io/flux/docs/flux-utils.html)) architecture. Routing is handled by [Aviator](https://github.com/swipely/aviator). OAuth is managed by [hello.js](http://adodson.com/hello.js/), and dates are processed with [Moment.js](http://momentjs.com/).
 
-The back-end is Node + Socket.IO and MongoDB.
+The site is compiled with [webpack](https://webpack.github.io/), scripts are transpiled from ES6 using [Babel](https://babeljs.io/), and styles are post-(pre-?)processed with [PostCSS](https://github.com/postcss/postcss).
 
-### Goals
+### Issues and Feature Improvements
 
-- [ ] Offline support using localStorage
-- [ ] Persistent storage in a database
-- [ ] Edit-in-place functionality for expenses
-- [ ] If it doesn't require anything crazy, port this sucker to React Native
+Progress and issues are tracked at https://github.com/jlengstorf/expense-tracker/issues

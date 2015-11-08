@@ -42,7 +42,7 @@ export default function Auth(props) {
     );
   } else {
     loginStatus = (
-      <p><a href="#" onClick={_showLogin}>login or register</a></p>
+      <p><a href="#" onClick={_showLogin} className="button auth__button">login or register</a></p>
     );
   }
 

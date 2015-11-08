@@ -34,6 +34,7 @@ Aviator.setRoutes(routeConfig);
 Aviator.dispatch();
 
 // views
+import Login from './View/Login';
 import Home from './View/Home';
 
 // components
@@ -41,7 +42,7 @@ import Add from './Add';
 import Expenses from './Expenses';
 import Total from './Total';
 import Debts from './Debts';
-import Auth from './Auth';
+/*import Auth from './Auth';*/
 
 // models
 import type Immutable from 'immutable';
@@ -180,7 +181,7 @@ class ExpenseTracker extends Component<{}, {}, State> {
     } else {
 
       // Show the login screen if the user isn't logged in.
-      components.push(<Auth appState={this.state.appState} />);
+      components.push(<Login appState={this.state.appState} />);
     }
 
     /*
@@ -226,8 +227,9 @@ class ExpenseTracker extends Component<{}, {}, State> {
     const view = this.state.appState.getIn(['view', 'page']);
     const params = this.state.appState.getIn(['view', 'params']);
 
-    log(`view: ${view}`);
-    log(`params: ${params}`);
+    const componentKey = `view-${view}`;
+
+    log(`renderView() called for the "${view}" view.`);
 
     /*
      * We start with an empty array to ensure that there's always something to
@@ -245,7 +247,7 @@ class ExpenseTracker extends Component<{}, {}, State> {
       case 'home':
         components.push(
           <Home
-            key={`heading-${view}`}
+            key={componentKey}
             appState={this.state.appState}
             groups={this.state.groups}
           />
@@ -254,29 +256,29 @@ class ExpenseTracker extends Component<{}, {}, State> {
 
       // TODO Create the groups view
       case 'groups':
-        components.push(<h1 key={`heading-${view}`}>Groups</h1>);
+        components.push(<h1 key={componentKey}>Groups</h1>);
         break;
 
       // TODO Create the account view
       case 'account':
-        components.push(<h1 key={`heading-${view}`}>Account</h1>);
+        components.push(<h1 key={componentKey}>Account</h1>);
         break;
 
       // TODO Create the expense view
       case 'expenses':
-        components.push(<h1 key={`heading-${view}`}>Expenses</h1>);
+        components.push(<h1 key={componentKey}>Expenses</h1>);
         components.push(<p key={`id-${view}`}>Group ID: {params.group_id}</p>);
         break;
 
       // TODO Create the category view
       case 'categories':
-        components.push(<h1 key={`heading-${view}`}>Categories</h1>);
+        components.push(<h1 key={componentKey}>Categories</h1>);
         components.push(<p key={`id-${view}`}>Group ID: {params.group_id}</p>);
         break;
 
       // TODO Create the group settings view
       case 'settings':
-        components.push(<h1 key={`heading-${view}`}>Group Settings</h1>);
+        components.push(<h1 key={componentKey}>Group Settings</h1>);
         components.push(<p key={`id-${view}`}>Group ID: {params.group_id}</p>);
         break;
 
@@ -284,7 +286,9 @@ class ExpenseTracker extends Component<{}, {}, State> {
       // TODO Create the login screen view
       case 'login':
       default:
-        components.push(<Auth appState={this.state.appState} />);
+        components.push(
+          <Login key={componentKey} appState={this.state.appState} />
+        );
         break;
 
     }
